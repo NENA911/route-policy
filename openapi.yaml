@@ -1,0 +1,545 @@
+openapi: 3.0.1
+info:
+  title: Route Policy
+  contact: {}
+  version: 3.0.3
+servers:
+- url: http://localhost/
+- url: https://localhost/
+paths: {}
+components:
+  schemas:
+    BusyActionType:
+      title: Busy Action Type
+      type: object
+      description: "The element returns 600 Busy Everywhere to the caller \n  properties:\n\
+        \    SIPInviteResponse:\n      description: \"Should be used to return 600\
+        \ (Busy Everywhere)\"\n      type: string\n  required:\n    - SIPInviteResponse"
+    RuleActionType:
+      title: Rule Action Type
+      description: As stated in RFC 4474, conditions are the 'if'-part of rules, whereas
+        actions and transformations form their 'then'-part.  The actions and transformations
+        parts of a rule determine which operations the proxy server MUST execute on
+        receiving a connection request attempt that matches all conditions of this
+        rule.  Actions and transformations permit certain operations to be executed
+      allOf:
+      - $ref: '#/components/schemas/BaseActionType'
+      - type: object
+    CallSuspicionScoreValueType:
+      title: Call Suspicion Score Value Type
+      type: object
+      properties:
+        suspicionScoreFromValue:
+          type: integer
+          description: Beginning of range for comparison of spam score
+          format: int32
+        suspicionScoreFromTo:
+          type: integer
+          description: End of range for comparison of spam score
+          format: int32
+      description: A value to be compared to the spam score in the SIP Message  attributes
+        "from" and "to".
+    ElementStateType:
+      title: Element State Type
+      type: object
+      description: "This element contains a domain attrubute where domain is a hostname,\
+        \ or a URI. If a URI is specified, the Domain function is used to extract\
+        \ the domain from the URI.  The domain must be that of a PSAP that the ESRP\
+        \ can     subscribe to the ElementState package for. \n  properties:\n   \
+        \ domainName:\n      description: 'hostname, or a URI used to determine hostname'\n\
+        \      type: string\n      "
+    AdditionalDataOperatorValuesCodeSimpleType:
+      title: Additional Data Operator Values Code Simple Type
+      type: string
+      description: These values are used to enumerate Additional Data Operators
+      example: equal
+      enum:
+      - equal
+      - not equal
+      - greater than
+      - less than
+      - greater than or equal
+      - less than or equal
+    MimeBodyType:
+      title: Mime Body Type
+      type: object
+      description: "Any element in a Body that is included in the message which is\
+        \ XML encoded.  If a Body contains more than one part (of a multipart) with\
+        \ the same mimetype, only the first part with that mimetype can be used. \
+        \ This  capability may be used to route on parameters in a CAP message. type:\
+        \ object\n  properties:\n    MimeContentCode:\n      description: A valid\
+        \ mime-type value to be compared to the contents of the incoming message.\n\
+        \      type: string\n    MimeElementText:\n      description: body contents\
+        \ of the mime message\n      type: string\n  required:\n    - MimeContentCode\n\
+        \    - MimeElementText\n    "
+    QueueStateValuesCodeSimpleType:
+      title: Queue State Values Code Simple Type
+      type: string
+      description: These values are used to enumerate Queue States
+      example: Active
+      enum:
+      - Active
+      - DiversionRequested
+      - Inactive
+      - Disabled
+    QueueStateValuesCodeType:
+      title: Queue State Values Code Type
+      type: object
+      properties:
+        id:
+          type: string
+        ref:
+          type: string
+        uri:
+          type: string
+        metadata:
+          type: string
+        relationshipMetadata:
+          type: string
+      description: These values are used to enumerate the Additional Data Operators
+    AdditionalDataTypeValuesCodeType:
+      title: Additional Data Type Values Code Type
+      type: object
+      properties:
+        id:
+          type: string
+        ref:
+          type: string
+        uri:
+          type: string
+        metadata:
+          type: string
+        relationshipMetadata:
+          type: string
+      description: These values are used to enumerate the Additional Data Types
+    BaseActionType:
+      title: Base Action Type
+      type: object
+      description: "As stated in RFC 4474 [86], conditions are the 'if'-part of rules,\
+        \ whereas actions and transformations form their 'then'-part. The actions\
+        \ and transformations parts of a rule determine which operations the proxy\
+        \ server MUST execute on receiving a connection request attempt that matches\
+        \ all conditions of this rule. Actions and transformations permit certain\
+        \ operations to be executed.\n - type: object\n  properties:\n    PriorityValue:\n\
+        \      description: >-\n        Each rule has to contain an unsigned integer\
+        \ value to indicate its priority.  When the conditions of two rules evaluate\
+        \ to 'true' then the rule with the higher priority value wins, i.e., the \
+        \ actions of that rule will be executed. Every rule MUST have a unique priority\
+        \ value.\n      type: integer\n      format: int32\n    ActionBody:\n    \
+        \  description: >-\n        Abstract element for substitution group; all elements\
+        \ below here may be used as Actions in the RuleActions.\n      type: string\n\
+        \  required:\n    - PriorityValue\n    - ActionBody\n    "
+    CallSuspicionType:
+      title: Call Suspicion Type
+      type: object
+      description: "This rule allows the spam-score header of the SIP message to be\
+        \ evaluated. - type: object\n  properties:\n    CallSuspicionScoreValue:\n\
+        \      $ref: '#/definitions/CallSuspicionScoreValueType'\n  required:\n  \
+        \  - CallSuspicionScoreValue\n    "
+    AdditionalDataRuleType:
+      title: Additional Data Rule Type
+      type: object
+      description: "A Policy Rule about other data.  A typical use for this element\
+        \ is to route based on the class of service components in the AdditionalCallData,\
+        \ or on language preferences in AdditionalCaller data. - $ref: '#/definitions/s_ObjectType'\
+        \ - type: object\n  properties:\n    AdditionalDataTypeValuesCode:\n     \
+        \ $ref: '#/definitions/AdditionalDataTypeValuesCodeType'\n    AdditionalDataElementNameText:\n\
+        \      description: >-\n        contains a the value of an element name of\
+        \ one of the elements in the AdditionalCall, AdditionalCaller and AdditionalLocation\
+        \ data   constructs.\n      type: string\n    AdditionalDataOperatorValuesCode:\n\
+        \      $ref: '#/definitions/AdditionalDataOperatorValuesCodeType'\n    AdditionalDataContentText:\n\
+        \      description: >-\n        A value to be compared with the  AdditionalDataElement\
+        \ value using the AdditionalDataOperatorValuesCode value\n      type: string\n\
+        \  required:\n    - AdditionalDataTypeValuesCode\n    - AdditionalDataElementNameText\n\
+        \    - AdditionalDataOperatorValuesCode\n    - AdditionalDataContentText\n\
+        \    "
+    TimePeriodType:
+      title: Time Period Type
+      type: object
+      properties:
+        startDate:
+          type: string
+          description: Start of interval (timestamp, see Section 3.2).  This attribute
+            is mandatory
+          format: date-time
+        endDate:
+          type: string
+          description: End of interval (timestamp).  This attribute is mandatory
+          format: date-time
+        startTime:
+          type: string
+          description: Start of time interval in a particular day.  It is of the TIME
+            data type as mentioned in Section.3.3.12 of RFC 5545 [174].  Time is local
+            time at the PSAP, including daylight savings. This attribute is optional.
+            The default value is 000000.  The "timestart" specifies a time value to
+            indicate the beginning of every day. The default value is 000000 representing
+            the beginning of the day.
+          format: date-time
+        endTime:
+          type: string
+          description: End of time interval in a particular day. It is of the TIME
+            data type as mentioned in Section.3.3.12 of RFC 5545 [174]. Time is local
+            time at the PSAP, including daylight savings.  This attribute is optional.
+            The default value is 235959. The "timeend" specifies a time value to indicate
+            the end of every day.  The default value is 235959 representing the end
+            of the day. If specified, must always be greater than the value of timestart
+          format: date-time
+        weekDayList:
+          type: string
+          description: "Specifies a comma-separated list of days of the week. \n \
+            \ \"MO\" indicates Monday,\n  \"TU\" indicates Tuesday, \n  \"WE” indicates\
+            \ Wednesday, \n  \"TH\" indicates Thursday, \n  \"FR\" indicates Friday,\
+            \ \n  \"SA\" indicates Saturday and \n  \"SU\" indicates Sunday.  \nThese\
+            \ values are not case-sensitive. Whitespace after a comma is permitted."
+      description: The time period is based on the description in Call Processing
+        Language, RFC 3880 [164], but with a reduced feature set.
+    RootType:
+      title: Root Type
+      required:
+      - ActionBody
+      - AdditionalDataContentText
+      - AdditionalDataElementNameText
+      - AdditionalDataOperatorValuesCode
+      - AdditionalDataRule
+      - AdditionalDataTypeValuesCode
+      - AssociationAugmentationPoint
+      - BusyAction
+      - CallSource
+      - CallSuspicion
+      - CallSuspicionScoreValue
+      - Condition
+      - ElementState
+      - IncomingQueueURI
+      - LocalTerm
+      - LostServiceURN
+      - MimeBody
+      - MimeContentCode
+      - MimeContentCodeList
+      - MimeElementText
+      - NormalNextHopURI
+      - NotifyAction
+      - NotifyCertaintyValue
+      - NotifyEventCodeValue
+      - NotifySeverityValue
+      - NotifyUrgencyValue
+      - ObjectAugmentationPoint
+      - PriorityValue
+      - QueueState
+      - QueueStateValuesCode
+      - RequestURI
+      - RouteAction
+      - RouteCauseCode
+      - RoutePolicyContentText
+      - RoutePolicyOperatorCode
+      - RouteRecipientURI
+      - RuleAction
+      - SIPHeaderName
+      - SIPHeaderRule
+      - SIPInviteResponse
+      - SecurityPosture
+      - ServiceState
+      - TimePeriod
+      type: object
+      properties:
+        ObjectAugmentationPoint:
+          type: string
+          description: An augmentation point for ObjectType
+        PriorityValue:
+          type: integer
+          description: Each rule has to contain an unsigned integer value to indicate
+            its priority.  When the conditions of two rules evaluate to 'true' then
+            the rule with the higher priority value wins, i.e., the actions of   that
+            rule will be executed. Every rule MUST have a unique priority value
+          format: int32
+        ActionBody:
+          type: string
+          description: Abstract element for substitution group; all elements below
+            here may be used as Actions in the RuleActions
+        Condition:
+          type: string
+          description: Abstract element for substitution group; all elements below
+            here may be used as Actions in the Conditions
+        RuleAction:
+          $ref: '#/components/schemas/RuleActionType'
+        AdditionalDataTypeValuesCode:
+          $ref: '#/components/schemas/AdditionalDataTypeValuesCodeType'
+        AdditionalDataElementNameText:
+          type: string
+          description: contains a the value of an element name of one of the elements
+            in the AdditionalCall, AdditionalCaller and AdditionalLocation data constructs.
+        AdditionalDataOperatorValuesCode:
+          $ref: '#/components/schemas/AdditionalDataOperatorValuesCodeType'
+        AdditionalDataContentText:
+          type: string
+          description: a value to be compared with the AdditionalDataElement value
+            using the AdditionalDataOperatorValuesCode value
+        SIPInviteResponse:
+          type: string
+          description: "Should be used to return\r\n600 (Busy Everywhere)"
+        CallSuspicionScoreValue:
+          $ref: '#/components/schemas/CallSuspicionScoreValueType'
+        MimeContentCode:
+          type: string
+          description: a valid mime-type value to be compared to the contents of the
+            incoming message
+        MimeElementText:
+          type: string
+          description: body contents of the mime message
+        RouteRecipientURI:
+          type: string
+          description: contains a URI that will become the Route header for the outgoing
+            SIP message (the Request URI is normally a service urn)
+        NotifyEventCodeValue:
+          type: string
+          description: event code to be sent in a NOTIFY message
+        NotifyUrgencyValue:
+          type: string
+          description: urgency to be sent in a NOTIFY message
+        NotifySeverityValue:
+          type: string
+          description: severity to be sent in a NOTIFY message
+        NotifyCertaintyValue:
+          type: string
+          description: event code to be sent in a NOTIFY message
+        RouteCauseCode:
+          type: string
+          description: contains the value used with the Reason header associated with
+            a History-Info header.  The values allowed for this element are defined
+            in a Registry that this document establishes.
+        SIPHeaderName:
+          type: string
+          description: The name of the header in a SIP message (such as the “From”,
+            To, Contact etc) that this RoutePolicy should be run against
+        RoutePolicyOperatorCode:
+          type: string
+          description: "Two operators are defined: \"=\" and “Is”.  The operator “\
+            equal” may be encountered in backwards-compatible implementations.\r\n\
+            If the value of this element is \"=\" the contents of the RoutePolicyContent\
+            \ element is compared against the value of the header specified by SIPHeaderName.\r\
+            \nIf the value of this element is \"Is\" the operator tests the header\
+            \ for the condition in the content.  The value “missing” means the header\
+            \ is not present. The value “erroneous” means the header has some error\
+            \ noticed by the ESRP."
+        RoutePolicyContentText:
+          type: string
+          description: "Contents to be compared against the value of the header when\
+            \ the RoutePolicyOperator is set to \"=\".\r\nValue to be used for processing\
+            \ when the RoutePolicyOperator is set to \"Is\".  The contents of this\
+            \ element must be set to a valid value from the registry.  The values\
+            \ defined in this document for valid RoutePolicyContent values are “missing”\
+            \ and “erroneous”."
+        BusyAction:
+          $ref: '#/components/schemas/BusyActionType'
+        NotifyAction:
+          $ref: '#/components/schemas/NotifyActionType'
+        RouteAction:
+          $ref: '#/components/schemas/RouteActionType'
+        AdditionalDataRule:
+          $ref: '#/components/schemas/AdditionalDataRuleType'
+        CallSource:
+          type: string
+          description: "CallSource (as defined in the Via headers of the INVITE),\
+            \ interpreted by the ESRP to ignore intra ESInet Vias, and other intermediaries.\
+            \  CallSource should be the ESRP’s best determination of the domain of\
+            \ the originating network that handled the call.  If there is more than\
+            \ one, the last Service Provider prior to the ESInet should be returned.\
+            \  If there are no originating networks, CallSource returns the domain\
+            \ of the caller\r\nThis element defines an extended version of the validity\
+            \ element; it is meant to be included as an extension element in the conditions\
+            \ element."
+        CallSuspicion:
+          $ref: '#/components/schemas/CallSuspicionType'
+        ElementState:
+          $ref: '#/components/schemas/ElementStateType'
+        IncomingQueueURI:
+          type: string
+          description: The URI of queue the call was received on.
+        LostServiceURN:
+          type: string
+          description: "This element carries the Service URN (either urn:service:...\
+            \ or urn:nena:service:...) attribute.  The condition evaluates to True\
+            \ if the LoST query was successful and false if it was not. If the query\
+            \ succeeded, the resulting URI is a variable called \"NormalNextHop\"\
+            , available to the rule evaluation system for subsequent rules.\r\nRules\
+            \ may make use of the following variables. Several rules require the ESRP\
+            \ to use the SIP-based notification mechanism described in RFC 3265 [17]\
+            \ to obtain the value of the variable\r\nThis element defines an extended\
+            \ version of the validity element; it is meant to be included as an extension\
+            \ element in the conditions element."
+        MimeBody:
+          $ref: '#/components/schemas/MimeBodyType'
+        MimeContentCodeList:
+          $ref: '#/components/schemas/MimeContentCodeListType'
+        NormalNextHopURI:
+          type: string
+          description: "The URI retrieved from the LoST query\r\nThis element defines\
+            \ an extended version of the validity element; it is meant to be included\
+            \ as an extension element in the conditions element."
+        QueueState:
+          $ref: '#/components/schemas/QueueStateType'
+        RequestURI:
+          type: string
+          description: "The URI associated with the call.  Normally this would be\
+            \ urn:service:sos, but may be different for calls to an admin line, etc\r\
+            \nThis element defines an extended version of the validity element; it\
+            \ is meant to be included as an extension element in the conditions element."
+        SecurityPosture:
+          $ref: '#/components/schemas/SecurityPostureType'
+        ServiceState:
+          $ref: '#/components/schemas/ElementStateType'
+        SIPHeaderRule:
+          $ref: '#/components/schemas/SIPHeaderRuleType'
+        TimePeriod:
+          $ref: '#/components/schemas/TimePeriodType'
+        QueueStateValuesCode:
+          $ref: '#/components/schemas/QueueStateValuesCodeType'
+        LocalTerm:
+          $ref: '#/components/schemas/appinfo_LocalTerm'
+        AssociationAugmentationPoint:
+          type: string
+          description: An augmentation point for AssociationType
+    QueueStateType:
+      title: Queue State Type
+      type: object
+      description: |-
+        This element carries a "queue" attribute, where "queue" is the name of a queue.  The value of the element is an enumerated state value. - type: object
+          properties:
+            queueName:
+              description: the name of a queue
+              type: string
+    RouteActionType:
+      title: Route Action Type
+      type: object
+      description: "The action supported in this section is forwarding of SIP messages\
+        \ to a specific URL.  \n  properties:\n    RouteRecipientURI:\n      description:\
+        \ >-\n        Contains a URI that will become the Route header for the outgoing\
+        \ SIP message (the Request URI is normally a service urn)\n      type: string\n\
+        \    RouteCauseCode:\n      description: >-\n        Contains the value used\
+        \ with the Reason header associated with a History-Info header. The values\
+        \ allowed for this element are defined in a Registry that this document establishes.\n\
+        \      type: string\n  required:\n    - RouteRecipientURI"
+    appinfo_LocalTerm:
+      title: Local Term
+      required:
+      - term
+      type: object
+      properties:
+        term:
+          minLength: 1
+          type: string
+        literal:
+          minLength: 1
+          type: string
+        definition:
+          minLength: 1
+          type: string
+        sourceURIs:
+          type: array
+          items:
+            type: string
+        SourceText:
+          type: array
+          items:
+            minLength: 1
+            type: string
+    SecurityPostureType:
+      title: Security Posture Type
+      type: object
+      properties:
+        domainName:
+          type: string
+          description: hostname, or a URI used to determine hostname
+      description: This element expressed carries a "domain" attribute where "domain"
+        is a hostname, or a URI. If a URI is specified, the domain function is used
+        to extract the domain from the URI. The domain must be that of an agency or
+        element that the ESRP can subscribe to the SecurityPosture package for
+    MimeContentCodeListType:
+      title: Mime Content Code List Type
+      type: object
+      description: "This element contains one or more child elements. Any mime type\
+        \ listed in a child element is compared with the content of the incoming message.\
+        \ The test of this condition element evaluates to TRUE if any of its child\
+        \ elements evaluate to TRUE, i.e., the results of the individual child element\
+        \ are combined using a logical OR. - type: object\n  properties:\n    MimeContentCode:\n\
+        \      description: >-\n        A valid mime-type value to be compared to\
+        \ the contents of the incoming message\n      type: array\n      items:\n\
+        \        type: string\n  required:\n    - MimeContentCode\n    "
+    ConditionType:
+      title: Condition Type
+      type: object
+      description: "This section contains NENA  enhancements of the conditions-part\
+        \ of the rule.  This document inherits the Common Policy functionality, including\
+        \ validity. The identity  and sphere condition is not used by this version\
+        \ of     the document. - type: object\n  properties:\n    Condition:\n   \
+        \   description: >-\n        Abstract element for substitution group; all\
+        \  elements below here may be used as Actions in the Conditions\n      type:\
+        \ array\n      items:\n        type: string\n  required:\n    - Condition\n\
+        \    "
+    AdditionalDataOperatorValuesCodeType:
+      title: Additional Data Operator Values Code Type
+      type: object
+      properties:
+        id:
+          type: string
+        ref:
+          type: string
+        uri:
+          type: string
+        metadata:
+          type: string
+        relationshipMetadata:
+          type: string
+      description: These values are used to enumerate the Additional Data Operators
+    NotifyActionType:
+      title: Notify Action Type
+      type: object
+      description: "The elements of this message are used to sends a NOTIFY message\
+        \ containing a CAP message to any entity  subscribing to the Normal-NextHop's\
+        \ ESRPnotify event for that reason code.  This may be used, for example, to\
+        \  advise other entities that calls are being diverted, etc.  If the recipient\
+        \ element is a service urn, the CAP message is wrapped in a SIP MESSAGE and\
+        \ is routed via the ECRF to the proper recipients. All indicated child elements\
+        \ provide information on how to populate the CAP message.  \n  properties:\n\
+        \    RouteRecipientURI:\n      description: >-\n        contains a URI that\
+        \ will become the Route header for the outgoing SIP message (the Request URI\
+        \ is normally a service urn)\n      type: string\n    NotifyEventCodeValue:\n\
+        \      description: event code to be sent in a NOTIFY message\n      type:\
+        \ string\n    NotifyUrgencyValue:\n      description: urgency to be sent in\
+        \ a NOTIFY message\n      type: string\n    NotifySeverityValue:\n      description:\
+        \ severity to be sent in a NOTIFY message\n      type: string\n    NotifyCertaintyValue:\n\
+        \      description: event code to be sent in a NOTIFY message\n      type:\
+        \ string\n  required:\n    - RouteRecipientURI\n    - NotifyEventCodeValue\n\
+        \    - NotifyUrgencyValue\n    - NotifySeverityValue\n    - NotifyCertaintyValue\n\
+        \    "
+    SIPHeaderRuleType:
+      title: SIP Header Rule Type
+      type: object
+      description: "Any header in a SIP message, such as the “From”, To, Contact etc.,\
+        \ can be used to perform actions on incoming messages.  This allows the creation\
+        \ of rules that are processed against SIP Header contents.   type: object\n\
+        \  properties:\n    SIPHeaderName:\n      description: >-\n        The name\
+        \ of the header in a SIP message (such as the “From”, To, Contact etc) that\
+        \ this  RoutePolicy should be run against\n      type: string\n    RoutePolicyOperatorCode:\n\
+        \      description: \"Two operators are defined: \\\"=\\\" and “Is”.  The\
+        \ operator “equal” may be encountered in backwards-compatible implementations.\\\
+        r\\nIf the value of this element is \\\"=\\\" the contents of the RoutePolicyContent\
+        \ element is compared against the value of the header specified by SIPHeaderName.\\\
+        r\\nIf the value of this element is \\\"Is\\\" the operator tests the header\
+        \ for the condition in the content.  The value “missing” means the header\
+        \ is not present. The value “erroneous” means the header has some error noticed\
+        \ by the ESRP.\"\n      type: string\n    RoutePolicyContentText:\n      description:\
+        \ \"Contents to be compared against the value of the header when the RoutePolicyOperator\
+        \ is set to \\\"=\\\".\\r\\nValue to be used for processing when the RoutePolicyOperator\
+        \ is set to \\\"Is\\\".  The contents of this element must be set to a valid\
+        \ value from the registry.  The values defined in this document for valid\
+        \ RoutePolicyContent values are “missing” and “erroneous”.\"\n      type:\
+        \ string\n      "
+    AdditionalDataTypeValuesCodeSimpleType:
+      title: Additional Data Type Values Code Simple Type
+      type: string
+      description: These values are used to enumerate Additional Data Types
+      example: call
+      enum:
+      - call
+      - caller
+      - location
